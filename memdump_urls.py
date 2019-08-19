@@ -1,16 +1,15 @@
 # Copyright (C) 2010-2015 Cuckoo Foundation.
 # This file is part of Cuckoo Sandbox - http://www.cuckoosandbox.org
 # See the file 'docs/LICENSE' for copying permission.
-from cuckoo.misc import cwd
-import os
-from urlparse import urlsplit
 
 try:
     import re2 as re
 except ImportError:
     import re
-
+import logging
 from lib.cuckoo.common.abstracts import Signature
+from cuckoo.misc import cwd
+from urlparse import urlsplit
 
 class ProcMemDumpURLs(Signature):
     name = "memdump_urls"
@@ -19,7 +18,6 @@ class ProcMemDumpURLs(Signature):
     categories = ["unpacking"]
     authors = ["Cuckoo Technologies"]
     minimum = "2.0"
-
     whitelist_file = cwd("whitelist", "domain.txt")
     whitelist = open(whitelist_file, "r")
 
@@ -37,6 +35,7 @@ class ProcMemDumpURLs(Signature):
                 for white in ProcMemDumpURLs.whitelist:
                     if re.match(white, url, re.IGNORECASE):
                         is_whitelisted = True
+                        log.debug("URL  whitelisted. Skipping ..." + url)
                         break
                 if not is_whitelisted:
                     self.mark_ioc("url", url)
